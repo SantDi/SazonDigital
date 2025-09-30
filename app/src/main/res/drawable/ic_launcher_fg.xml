@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Bag outline -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M30,42h48c3.3,0 6,2.7 6,6v30c0,6.6 -5.4,12 -12,12H36c-6.6,0 -12,-5.4 -12,-12V48c0,-3.3 2.7,-6 6,-6z"/>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="4"
+        android:pathData="M30,42h48c3.3,0 6,2.7 6,6v30c0,6.6 -5.4,12 -12,12H36c-6.6,0 -12,-5.4 -12,-12V48c0,-3.3 2.7,-6 6,-6z"/>
+    <!-- Handle -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1A1A1A"
+        android:strokeWidth="4"
+        android:pathData="M42,42c0,-8 24,-8 24,0"/>
+    <!-- Three dots -->
+    <path android:fillColor="#1A1A1A" android:pathData="M45,66a3,3 0 1,0 0.01,0z"/>
+    <path android:fillColor="#1A1A1A" android:pathData="M54,66a3,3 0 1,0 0.01,0z"/>
+    <path android:fillColor="#1A1A1A" android:pathData="M63,66a3,3 0 1,0 0.01,0z"/>
+</vector>
