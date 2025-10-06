@@ -13,7 +13,7 @@ android {
     }
 
     namespace = "com.sazon.digital"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.sazon.digital"
@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.foundation:foundation:1.9.2")
     val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
     implementation(composeBom)
     androidTestImplementation(composeBom)

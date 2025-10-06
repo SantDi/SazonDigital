@@ -14,7 +14,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 @Composable
 fun WebPane() {
     var url by remember { mutableStateOf("https://developer.android.com") }
-    Column(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize())
+
+    //  identificador de la pagina web de la app
+    {
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),

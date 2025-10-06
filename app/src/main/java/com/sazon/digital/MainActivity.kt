@@ -9,17 +9,25 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.sazon.digital.data.Recipe
@@ -28,17 +36,6 @@ import com.sazon.digital.ui.WebPane
 import com.sazon.digital.ui.store.StoreViewModel
 import com.sazon.digital.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.coroutines.launch
 
 enum class Pane { Perfil, Galeria, Video, Web, Tienda }
 
@@ -46,66 +43,81 @@ enum class Pane { Perfil, Galeria, Video, Web, Tienda }
 fun AppScaffold() {
     var title by rememberSaveable { mutableStateOf("Perfil") }
     var selected by rememberSaveable { mutableStateOf(Pane.Perfil) }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerContent = {
-            ModalDrawerSheet {
-                Text(
-                    "Sazón Digital",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Divider()
-                DrawerItems(selected = selected) { sel ->
-                    selected = sel
-                    title = when (sel) {
-                        Pane.Perfil -> "Perfil"
-                        Pane.Galeria -> "Galería"
-                        Pane.Video -> "Video"
-                        Pane.Web -> "Web"
-                        Pane.Tienda -> "Tienda"
-                    }
-                }
-            }
-        },
-        drawerState = drawerState
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Sazón Digital · $title") },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                if (drawerState.isClosed) drawerState.open()
-                                else drawerState.close()
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Abrir menú"
-                            )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Sazón Digital · $title") },
+            )
+        }
+    ) { innerPadding ->
+        Row(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+
+            Surface(
+                tonalElevation = 3.dp,
+                shadowElevation = 3.dp,
+                modifier = Modifier
+                    .width(120.dp)
+                    .fillMaxHeight()
+            ) {
+                Column(
+                    Modifier
+                        .fillMaxHeight()
+                        .padding(vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Sazón",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Divider()
+                    DrawerItems(selected = selected) { sel ->
+                        selected = sel
+                        title = when (sel) {
+                            Pane.Perfil -> "Perfil"
+                            Pane.Galeria -> "Galería"
+                            Pane.Video -> "Video"
+                            Pane.Web -> "Web"
+                            Pane.Tienda -> "Tienda"
                         }
                     }
-                )
-            }
-        ) { inner ->
-            TwoPaneScreen(
-                modifier = Modifier.padding(inner),
-                selected = selected,
-                onSelect = { sel ->
-                    selected = sel
-                    title = when (sel) {
-                        Pane.Perfil -> "Perfil"
-                        Pane.Galeria -> "Galería"
-                        Pane.Video -> "Video"
-                        Pane.Web -> "Web"
-                        Pane.Tienda -> "Tienda"
-                    }
                 }
-            )
+            }
+
+
+            Box(
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(16.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Box(
+                    Modifier
+                        .widthIn(max = 900.dp)
+                        .fillMaxWidth()
+                ) {
+                    TwoPaneScreen(
+                        selected = selected,
+                        onSelect = { sel ->
+                            selected = sel
+                            title = when (sel) {
+                                Pane.Perfil -> "Perfil"
+                                Pane.Galeria -> "Galería"
+                                Pane.Video -> "Video"
+                                Pane.Web -> "Web"
+                                Pane.Tienda -> "Tienda"
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -117,6 +129,7 @@ fun DrawerItems(selected: Pane, onSelect: (Pane) -> Unit) {
     val cart by vm.cart.collectAsState()
     val count = cart.size
 
+    // Lista de secciones del menú
     val entries = listOf(
         Triple(Pane.Perfil, R.drawable.ic_lucide_square_user, "Perfil"),
         Triple(Pane.Galeria, R.drawable.ic_lucide_images, "Galería"),
@@ -125,24 +138,71 @@ fun DrawerItems(selected: Pane, onSelect: (Pane) -> Unit) {
         Triple(Pane.Tienda, R.drawable.ic_lucide_shopping_bag, "Tienda"),
     )
 
-    entries.forEach { (pane, icon, label) ->
-        NavigationDrawerItem(
-            label = { Text(label) },
-            selected = selected == pane,
-            onClick = { onSelect(pane) },
-            icon = {
+    // Menú vertical con íconos y texto debajo
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(120.dp) // 👈 ancho compacto del menú
+            .padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "Sazón Digital",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Ítems del menú
+        entries.forEach { (pane, icon, label) ->
+            val isSelected = selected == pane
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(vertical = 6.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onSelect(pane) }
+                    .background(
+                        if (isSelected)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                        else
+                            MaterialTheme.colorScheme.surface
+                    )
+                    .padding(vertical = 10.dp, horizontal = 6.dp)
+            ) {
                 if (pane == Pane.Tienda && count > 0) {
                     BadgedBox(badge = { Badge { Text(count.toString()) } }) {
-                        Icon(painterResource(icon), contentDescription = label)
+                        Icon(
+                            painter = painterResource(icon),
+                            contentDescription = label,
+                            modifier = Modifier.size(26.dp)
+                        )
                     }
                 } else {
-                    Icon(painterResource(icon), contentDescription = label)
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = label,
+                        modifier = Modifier.size(26.dp)
+                    )
                 }
-            },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
+
+                Spacer(Modifier.height(4.dp))
+
+                Text(
+                    text = label,
+                    fontSize = 11.sp, // 👈 texto más pequeño
+                    lineHeight = 12.sp,
+                    color = if (isSelected)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -181,8 +241,8 @@ fun TwoPaneScreen(modifier: Modifier = Modifier, selected: Pane, onSelect: (Pane
 fun PerfilPane() {ElevatedCard(
     shape = RoundedCornerShape(24.dp),
     modifier = Modifier
-        .fillMaxWidth()          // antes: fillMaxSize()
-        .wrapContentHeight()     // evita que se estire verticalmente
+        .fillMaxWidth()
+        .wrapContentHeight()
 ) {
     Row(Modifier.padding(20.dp)) {
         AsyncImage(
@@ -193,6 +253,7 @@ fun PerfilPane() {ElevatedCard(
                 .clip(RoundedCornerShape(20.dp)),
             contentScale = ContentScale.Crop
         )
+        //  identificador del perfil de la app
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
             Text("Alex Chef", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
@@ -200,7 +261,7 @@ fun PerfilPane() {ElevatedCard(
 
             Spacer(Modifier.height(12.dp))
 
-            // ⬇️ chips compactos, sin fillMaxHeight
+
             Row(
                 modifier = Modifier
                     .wrapContentHeight()
@@ -210,7 +271,7 @@ fun PerfilPane() {ElevatedCard(
             ) {
                 AssistChip(onClick = {}, label = { Text("Pastas",  maxLines = 1, overflow = TextOverflow.Ellipsis) })
                 AssistChip(onClick = {}, label = { Text("Postres", maxLines = 1, overflow = TextOverflow.Ellipsis) })
-//                    AssistChip(onClick = {}, label = { Text("Parrilla",maxLines = 1, overflow = TextOverflow.Ellipsis) })
+
             }
             Row(
                 modifier = Modifier
@@ -219,8 +280,7 @@ fun PerfilPane() {ElevatedCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-//                    AssistChip(onClick = {}, label = { Text("Pastas",  maxLines = 1, overflow = TextOverflow.Ellipsis) })
-//                    AssistChip(onClick = {}, label = { Text("Postres", maxLines = 1, overflow = TextOverflow.Ellipsis) })
+
                 AssistChip(onClick = {}, label = { Text("Parrilla",maxLines = 1, overflow = TextOverflow.Ellipsis) })
             }
 
@@ -237,6 +297,8 @@ fun PerfilPane() {ElevatedCard(
 fun GaleriaPane() { var query by rememberSaveable { mutableStateOf("") }
     var dialogTitle by remember { mutableStateOf<String?>(null) }
 
+    // propiedades de las comidas en la galeria
+
     val all = listOf(
         Recipe(title = "Pasta al pesto", imageUrl = "https://images.unsplash.com/photo-1521389508051-d7ffb5dc8bbf", description = "Fideos con pesto de albahaca."),
         Recipe(title = "Hamburguesa", imageUrl = "https://images.unsplash.com/photo-1550547660-d9450f859349", description = "Clásica doble con queso."),
@@ -248,6 +310,7 @@ fun GaleriaPane() { var query by rememberSaveable { mutableStateOf("") }
     val demo = remember(query) {
         if (query.isBlank()) all else all.filter { it.title.contains(query, ignoreCase = true) }
     }
+    //  identificador de las comidas en galeria
 
     Column(Modifier.fillMaxSize()) {
         OutlinedTextField(
@@ -289,6 +352,7 @@ fun GaleriaPane() { var query by rememberSaveable { mutableStateOf("") }
             confirmButton = { TextButton(onClick = { dialogTitle = null }) { Text("Cerrar") } },
             title = { Text("Detalle") },
             text = { Text(dialogTitle ?: "") }
+            // vinculo de detalles de las comidas en galeria
         )
     }}
 
@@ -303,6 +367,7 @@ fun VideoPane() { Column(Modifier.fillMaxSize()) {
             .height(220.dp)
             .clip(RoundedCornerShape(16.dp))
     )
+    // identificador de la seccion de video
 }
 }
 
@@ -315,6 +380,8 @@ fun TiendaPane(vm: StoreViewModel = hiltViewModel()) { val products by vm.produc
 
     val snackbar = remember { SnackbarHostState() }
     var showCart by rememberSaveable { mutableStateOf(false) }
+
+    //  propiedades del carrito
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
@@ -337,6 +404,7 @@ fun TiendaPane(vm: StoreViewModel = hiltViewModel()) { val products by vm.produc
                 FilledTonalButton(onClick = { showCart = true }) {
                     Text("Ver carrito (${cart.size})")
                 }
+                // identificador del carrito
             }
 
             Spacer(Modifier.height(8.dp))
@@ -362,6 +430,8 @@ fun TiendaPane(vm: StoreViewModel = hiltViewModel()) { val products by vm.produc
                                 .height(120.dp),
                             contentScale = ContentScale.Crop
                         )
+
+
                         Column(Modifier.padding(12.dp)) {
                             Text(p.name, style = MaterialTheme.typography.titleMedium)
                             Text("$ " + (p.price / 100) + "." + (p.price % 100).toString().padStart(2,'0'),
@@ -370,7 +440,8 @@ fun TiendaPane(vm: StoreViewModel = hiltViewModel()) { val products by vm.produc
                             Button(onClick = { vm.toggleCart(p.id) }, shape = RoundedCornerShape(24.dp)) {
                                 Text(if (inCart) "Quitar" else "Agregar")
                             }
-                        }
+                        }  //  identificador de la tienda
+
                     }
                 }
             }
